@@ -8,6 +8,9 @@
   ],
   "scripts": {
     "typecheck": "tsc --build --dry",
-    "test:core": "node --experimental-strip-types --test packages/core/src/**/*.test.ts"
+    "test:core": "npx tsx --test packages/core/src/glideCone.test.ts packages/core/src/flyability.test.ts packages/core/src/windProfile.test.ts packages/core/src/densityAltitude.test.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.13"
   }
 }

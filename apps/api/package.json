@@ -1,0 +1,19 @@
+{
+  "name": "@aeroparamotor/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node --experimental-strip-types src/server.ts"
+  },
+  "dependencies": {
+    "@aeroparamotor/core": "*",
+    "fastify": "^5.1.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.13",
+    "@types/node": "^22.10.2"
+  }
+}

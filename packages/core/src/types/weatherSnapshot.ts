@@ -1,4 +1,7 @@
-export type WeatherModel = "ECMWF" | "GFS" | "ICON-D2" | "HRRR";
+// ICON-D2 (DWD, ~2km) only covers Central Europe; HRRR (NOAA, ~3km) only covers
+// the CONUS. Neither has a high-res equivalent over Mexico, so "ICON" (global,
+// ~11km) is the fallback used there alongside ECMWF/GFS. See docs/PRODUCT_SPEC.md.
+export type WeatherModel = "ECMWF" | "GFS" | "ICON" | "ICON-D2" | "HRRR";
 
 export type FlyabilityLevel = "green" | "yellow" | "red";
 

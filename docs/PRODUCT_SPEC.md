@@ -281,11 +281,29 @@ aeroparamotor-os/
 | **Cables de alta tensión, antenas, LZs** | **OpenStreetMap** vía Overpass API (`power=line`, `power=tower`, `man_made=mast`) | Complementar con reportes propios de la comunidad de pilotos dentro de la app; OSM no siempre está actualizado en zonas rurales. |
 | **Modelos meteo multi-modelo (ECMWF/GFS/ICON-D2/HRRR)** | **Open-Meteo API** — https://open-meteo.com | Sin key para uso no comercial; esta es la pieza central del motor de meteorología del punto 1. |
 
-### Qué necesito que me pases para avanzar
+### Decisiones confirmadas (México + EE. UU.)
 
-1. **Región(es) piloto** donde vas a lanzar primero (país/zona) — define si priorizamos
-   OpenAIP+FAA (EE.UU.) o AIP europeo, y qué extractos de PMTiles generar primero.
-2. Si ya tienes **API keys** de alguno de estos servicios (OpenAIP, MapTiler, Windy), o si
-   las gestiono yo con cuentas de prueba gratuitas para el MVP.
-3. Confirmar el **stack elegido** en la sección 1 (o decirme qué cambiar) para que el
-   siguiente paso sea scaffolding real de `apps/web` (Next.js) y `apps/api` (Fastify).
+- **Espacio aéreo:** OpenAIP para ambos países — es la única fuente abierta con cobertura
+  real en México (el AIP europeo/EAD no cubre LATAM ni EE. UU.).
+- **Modelos meteo por región** (implementado en `apps/api/src/services/openMeteoClient.ts`):
+  - EE. UU.: ECMWF + **HRRR** (alta resolución, ~3km, solo cubre CONUS) + GFS.
+  - México: ECMWF + GFS + **ICON global** (~11km) — *nota técnica*: ni HRRR ni ICON-D2
+    tienen equivalente de alta resolución sobre México, así que ahí el "mejor modelo"
+    realista es la comparación ECMWF/GFS/ICON global, no un modelo regional fino. Esto
+    se refleja en el tipo `WeatherModel` (`packages/core/src/types/weatherSnapshot.ts`).
+
+### Limitación del entorno de desarrollo actual
+
+Este sandbox de ejecución **no tiene salida a internet general** (solo a registros npm/pip
+y APIs de Anthropic), así que no puedo hacer llamadas en vivo a Open-Meteo/OpenAIP ni crear
+cuentas/API keys en tu nombre (requieren verificación de email). Lo que sí hice:
+
+- Implementé y probé end-to-end el backend (`apps/api`) contra este límite: levanté el
+  servidor Fastify real, y verifiqué que `/health` responde, `/airspace/near` da `503`
+  con instrucciones cuando falta `OPENAIP_API_KEY`, y `/weather/snapshot` intenta las
+  llamadas reales a Open-Meteo y reporta `502` honestamente cuando fallan (en tu máquina/
+  servidor con internet normal, esas mismas llamadas funcionarán sin cambios de código).
+- Para la key de OpenAIP: regístrate gratis en https://www.openaip.net (Account → API
+  Clients) y pega la key en `apps/api/.env` (copia `.env.example`). Open-Meteo no requiere
+  key. Cuando tengas un entorno con salida a internet (tu máquina local, o desplegado en
+  un servidor), el mismo código funciona sin tocarlo.
