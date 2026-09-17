@@ -307,3 +307,13 @@ cuentas/API keys en tu nombre (requieren verificación de email). Lo que sí hic
   Clients) y pega la key en `apps/api/.env` (copia `.env.example`). Open-Meteo no requiere
   key. Cuando tengas un entorno con salida a internet (tu máquina local, o desplegado en
   un servidor), el mismo código funciona sin tocarlo.
+
+**Estado de las keys (2026-09-17):** OpenAIP y MapTiler ya están configuradas localmente
+(`apps/api/.env`, `apps/web/.env.local`, `apps/mobile/.env` — los tres en `.gitignore`,
+nunca se suben al repo; solo los `.env.example` correspondientes quedan versionados).
+Verificado que `apps/api` lee `OPENAIP_API_KEY` correctamente (el request llega hasta
+intentar resolver `api.openaip.net`, bloqueado solo por DNS del sandbox). MapTiler se usa
+del lado del cliente (`NEXT_PUBLIC_MAPTILER_KEY` / `EXPO_PUBLIC_MAPTILER_KEY`) para las
+capas de mapa base, terreno y satelital en `apps/web`/`apps/mobile` una vez scaffoldeadas,
+y opcionalmente en `apps/api` (`MAPTILER_API_KEY`) para jobs de empaquetado de PMTiles/
+Terrain-RGB offline.
