@@ -1,0 +1,13 @@
+{
+  "name": "aeroparamotor-os",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc --build --dry",
+    "test:core": "node --experimental-strip-types --test packages/core/src/**/*.test.ts"
+  }
+}
