@@ -9,21 +9,30 @@ Especificación completa: [`docs/PRODUCT_SPEC.md`](./docs/PRODUCT_SPEC.md).
 ## Estructura
 
 - `packages/core` — tipos de dominio y algoritmos compartidos (TypeScript puro, sin
-  dependencias de plataforma). **Ya implementado**: `PilotProfile`, `WeatherSnapshot`,
-  `RoutePlan`, `FlightLog`, y el algoritmo de cono de planeo (`glideCone.ts`, testeado).
+  dependencias de plataforma; imports sin extensión, compatible con `tsx`/Node y con el
+  bundler Metro de React Native). Implementado: `PilotProfile`, `WeatherSnapshot`,
+  `RoutePlan`, `FlightLog`, cono de planeo, Flyability Score, interpolación de perfil de
+  viento y altitud de densidad — 17/17 tests pasando.
+- `apps/mobile` — app iOS/Android/Web (Expo + React Navigation). **Scaffoldeada y
+  funcional**: tabs Briefing/Mapa/Ruta/Bitácora/Perfil + Modo Vuelo (HUD con GPS real vía
+  `expo-location` y chequeo de cono de planeo en vivo). Verificado con `tsc --noEmit`,
+  bundle real de Metro, y capturas de pantalla navegando la app en Chromium.
 - `apps/web` — PWA (Next.js). Pendiente de scaffolding.
-- `apps/mobile` — app iOS/Android (Expo). Pendiente de scaffolding.
-- `apps/api` — backend (Fastify + PostgreSQL/PostGIS). Pendiente de scaffolding.
+- `apps/api` — backend (Fastify + PostgreSQL/PostGIS). Servidor real con endpoints
+  `/health`, `/weather/snapshot` (Open-Meteo multi-modelo) y `/airspace/near` (OpenAIP),
+  CORS habilitado para desarrollo local.
 
-## Verificar el algoritmo de cono de planeo
-
-Los tests usan `node:test` y corren directamente sobre TypeScript con el type-stripping
-nativo de Node 22+. Como el código fuente usa la convención NodeNext (imports con
-extensión `.js` apuntando a archivos `.ts`, para compatibilidad futura con `tsc`/bundlers),
-para ejecutarlos directo con `node` hace falta compilar o usar `tsx`:
+## Correr todo en local
 
 ```bash
-npx tsx --test packages/core/src/glideCone.test.ts
+npm install                          # instala todo el monorepo (workspaces)
+npm run test:core                    # 17/17 tests de packages/core
+
+npm run dev -w apps/api              # backend en http://localhost:3001
+npm run web -w apps/mobile           # app en el navegador (Expo web)
+# o: npm run start -w apps/mobile    # Metro + QR para Expo Go / dev client
 ```
 
-(o compilar el paquete con `tsc` y correr `node --test` sobre el `dist/` resultante).
+Copia `apps/api/.env.example` → `apps/api/.env` y `apps/mobile/.env.example` → `.env`
+(y `apps/web/.env.example` → `.env.local` cuando exista) con tus keys de OpenAIP y
+MapTiler — ver `docs/PRODUCT_SPEC.md` sección 6.

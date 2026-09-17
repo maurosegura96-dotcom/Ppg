@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { computeFlyabilityScore, computeWindShearIndex } from "./flyability.js";
+import { computeFlyabilityScore, computeWindShearIndex } from "./flyability";
 
 const advancedPilot = {
   experienceLevel: "advanced" as const,

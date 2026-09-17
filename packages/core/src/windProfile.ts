@@ -1,4 +1,4 @@
-import type { WindLayer } from "./types/weatherSnapshot.js";
+import type { WindLayer } from "./types/weatherSnapshot";
 
 export interface RawWindPoint {
   altitudeAglM: number;

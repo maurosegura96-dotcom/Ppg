@@ -1,4 +1,4 @@
-import { type LatLon, bearingDeg, destinationPoint, haversineDistanceM } from "./geo.js";
+import { type LatLon, bearingDeg, destinationPoint, haversineDistanceM } from "./geo";
 
 export interface GlideConeInput {
   position: LatLon;

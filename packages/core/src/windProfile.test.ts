@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { interpolateWindLayers } from "./windProfile.js";
+import { interpolateWindLayers } from "./windProfile";
 
 test("interpolates speed linearly at the midpoint between two known samples", () => {
   const result = interpolateWindLayers(

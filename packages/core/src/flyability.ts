@@ -1,5 +1,5 @@
-import type { FlyabilityScore, WindLayer } from "./types/weatherSnapshot.js";
-import type { ExperienceLevel, WindTolerance } from "./types/pilotProfile.js";
+import type { FlyabilityScore, WindLayer } from "./types/weatherSnapshot";
+import type { ExperienceLevel, WindTolerance } from "./types/pilotProfile";
 
 export interface FlyabilityInput {
   surfaceWind: { speedKt: number; gustKt: number };

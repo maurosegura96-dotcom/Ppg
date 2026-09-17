@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { computeDensityAltitudeFt } from "./densityAltitude.js";
+import { computeDensityAltitudeFt } from "./densityAltitude";
 
 test("standard sea-level ISA conditions yield ~0 density altitude", () => {
   const da = computeDensityAltitudeFt({

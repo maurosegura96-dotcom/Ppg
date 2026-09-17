@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { computeGlideCone, isLzWithinGlide, findReachableLzs } from "./glideCone.js";
+import { computeGlideCone, isLzWithinGlide, findReachableLzs } from "./glideCone";
 
 const baseInput = {
   position: { lat: 40.0, lon: -3.0 },
