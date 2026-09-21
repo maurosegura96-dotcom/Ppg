@@ -1,6 +1,8 @@
-import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { colors, spacing, typography } from "../theme/tokens";
 import { usePilotStore } from "../store/pilotStore";
+import { getApiBaseUrl, setApiBaseUrl } from "../config/apiConfig";
 
 function Field({ label, value, onChangeText, keyboardType }: {
   label: string;
@@ -24,10 +26,39 @@ function Field({ label, value, onChangeText, keyboardType }: {
 
 export default function ProfileScreen() {
   const { profile, updateProfile } = usePilotStore();
+  const [serverUrl, setServerUrl] = useState("");
+  const [savedMessage, setSavedMessage] = useState(false);
+
+  useEffect(() => {
+    getApiBaseUrl().then(setServerUrl);
+  }, []);
+
+  const handleSaveServer = async () => {
+    await setApiBaseUrl(serverUrl);
+    setSavedMessage(true);
+    setTimeout(() => setSavedMessage(false), 2000);
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Perfil</Text>
+
+      <Text style={styles.sectionTitle}>Servidor</Text>
+      <View style={styles.field}>
+        <Text style={styles.fieldLabel}>Dirección de la API (Briefing/meteo)</Text>
+        <TextInput
+          style={styles.input}
+          value={serverUrl}
+          onChangeText={setServerUrl}
+          placeholder="https://tu-servidor.onrender.com"
+          placeholderTextColor={colors.textSecondary}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        <Pressable style={styles.saveButton} onPress={handleSaveServer}>
+          <Text style={styles.saveButtonText}>{savedMessage ? "Guardado ✓" : "Guardar"}</Text>
+        </Pressable>
+      </View>
 
       <Text style={styles.sectionTitle}>Tolerancia de viento</Text>
       <Field
@@ -92,4 +123,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.sm,
   },
+  saveButton: {
+    backgroundColor: colors.accent,
+    borderRadius: 10,
+    paddingVertical: spacing.sm,
+    alignItems: "center",
+    marginTop: spacing.xs,
+  },
+  saveButtonText: { color: colors.background, fontWeight: "700" },
 });

@@ -33,6 +33,17 @@
           "locationAlwaysAndWhenInUsePermission": "AeroParamotor OS usa tu ubicación para el GPS en vivo del Modo Vuelo y el cono de planeo de emergencia."
         }
       ]
-    ]
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/aec19682-4cf8-463b-b18a-91fd749c6d83"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "aec19682-4cf8-463b-b18a-91fd749c6d83"
+      }
+    }
   }
 }

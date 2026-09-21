@@ -1,12 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { WeatherSnapshot } from "@aeroparamotor/core";
 import { colors, flyabilityColor, spacing, typography } from "../theme/tokens";
-
-// Dev-only: point at the local API. In production this becomes an env var
-// resolved per-environment (see apps/api README for the deploy target).
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+import { getApiBaseUrl } from "../config/apiConfig";
 
 // Home site placeholder (Valle de Bravo, MX) until "favorite sites" (Perfil)
 // picks a real one and GPS-based auto-detect lands.
@@ -14,29 +11,42 @@ const HOME_SITE = { lat: 19.1947, lon: -100.1339 };
 
 type FetchState =
   | { status: "loading" }
-  | { status: "error"; message: string }
+  | { status: "error"; message: string; apiBaseUrl: string }
   | { status: "ready"; snapshots: WeatherSnapshot[] };
 
 export default function HomeBriefingScreen() {
   const navigation = useNavigation<any>();
   const [state, setState] = useState<FetchState>({ status: "loading" });
 
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch(`${API_BASE_URL}/weather/snapshot?lat=${HOME_SITE.lat}&lon=${HOME_SITE.lon}`, {
-      signal: controller.signal,
-    })
-      .then(async (res) => {
-        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((body: { snapshots: WeatherSnapshot[] }) => setState({ status: "ready", snapshots: body.snapshots }))
-      .catch((err) => {
-        if (err.name === "AbortError") return;
-        setState({ status: "error", message: String(err.message ?? err) });
-      });
-    return () => controller.abort();
-  }, []);
+  // Re-fetch every time this tab regains focus, so editing the server URL in
+  // Perfil and coming back here retries against the new address immediately.
+  useFocusEffect(
+    useCallback(() => {
+      const controller = new AbortController();
+      setState({ status: "loading" });
+
+      (async () => {
+        const apiBaseUrl = await getApiBaseUrl();
+        try {
+          const res = await fetch(
+            `${apiBaseUrl}/weather/snapshot?lat=${HOME_SITE.lat}&lon=${HOME_SITE.lon}`,
+            { signal: controller.signal },
+          );
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error(body.error ?? `HTTP ${res.status}`);
+          }
+          const body: { snapshots: WeatherSnapshot[] } = await res.json();
+          setState({ status: "ready", snapshots: body.snapshots });
+        } catch (err: any) {
+          if (err?.name === "AbortError") return;
+          setState({ status: "error", message: String(err?.message ?? err), apiBaseUrl });
+        }
+      })();
+
+      return () => controller.abort();
+    }, []),
+  );
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -58,7 +68,7 @@ export default function HomeBriefingScreen() {
           <Text style={[styles.body, { color: colors.red }]}>No se pudo cargar el briefing meteo.</Text>
           <Text style={styles.bodySecondary}>{state.message}</Text>
           <Text style={styles.bodySecondary}>
-            Verifica que apps/api esté corriendo (npm run dev -w apps/api) y accesible en {API_BASE_URL}.
+            Servidor configurado: {state.apiBaseUrl} — puedes cambiarlo en la pestaña Perfil.
           </Text>
         </View>
       )}
